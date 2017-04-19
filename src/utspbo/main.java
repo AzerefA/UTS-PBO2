@@ -130,6 +130,26 @@ public class main extends javax.swing.JFrame {
         }
             tabel.setModel(dtm);
         }
+    
+    public void selectCari(){
+        String caris = cari.getText();
+        String kolom[] = {"ID Barang","Nama Barang","Harga"};
+            DefaultTableModel dtm = new DefaultTableModel(null, kolom);
+            String SQL = "SELECT * FROM produk where nama_barang REGEXP '"+caris+"'";
+            ResultSet rs = KoneksiDB.executeQuery(SQL);
+            try {
+                while (rs.next()) {
+                    String id = rs.getString(1);
+                    String barang = rs.getString(2);
+                    String harga = rs.getString(3);
+                    String data[] = {id,barang,harga};
+                    dtm.addRow(data);
+                }
+        } catch (SQLException ex) {
+                Logger.getLogger(main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+            tabel1.setModel(dtm);
+    }
 
     public void setTanggal(){
     java.util.Date skrg = new java.util.Date();
@@ -155,7 +175,7 @@ public class main extends javax.swing.JFrame {
         Jaml1 = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        tabel = new javax.swing.JTable();
+        tabel1 = new javax.swing.JTable();
         jPanel5 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         jumlah = new javax.swing.JTextField();
@@ -167,6 +187,10 @@ public class main extends javax.swing.JFrame {
         jPanel2 = new javax.swing.JPanel();
         kasir = new javax.swing.JLabel();
         kasirs = new javax.swing.JLabel();
+        cari = new javax.swing.JTextField();
+        jLabel6 = new javax.swing.JLabel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        tabel = new javax.swing.JTable();
         jPanel4 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
         save = new javax.swing.JButton();
@@ -217,7 +241,7 @@ public class main extends javax.swing.JFrame {
         jPanel3.setBackground(new java.awt.Color(255, 102, 0));
         jPanel3.setLayout(null);
 
-        tabel.setModel(new javax.swing.table.DefaultTableModel(
+        tabel1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null},
                 {null, null, null},
@@ -236,10 +260,10 @@ public class main extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
-        jScrollPane1.setViewportView(tabel);
+        jScrollPane1.setViewportView(tabel1);
 
         jPanel3.add(jScrollPane1);
-        jScrollPane1.setBounds(10, 10, 960, 270);
+        jScrollPane1.setBounds(10, 340, 650, 130);
 
         jPanel5.setBackground(new java.awt.Color(255, 204, 51));
         jPanel5.setLayout(null);
@@ -277,22 +301,65 @@ public class main extends javax.swing.JFrame {
         print.setBounds(20, 150, 80, 30);
 
         jPanel3.add(jPanel5);
-        jPanel5.setBounds(670, 290, 300, 190);
+        jPanel5.setBounds(670, 280, 300, 190);
 
         jPanel2.setLayout(null);
 
         kasir.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        kasir.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        kasir.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        kasir.setVerticalAlignment(javax.swing.SwingConstants.TOP);
         jPanel2.add(kasir);
         kasir.setBounds(110, 10, 220, 40);
 
         kasirs.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         kasirs.setText("Nama Kasir:");
         jPanel2.add(kasirs);
-        kasirs.setBounds(10, 0, 100, 20);
+        kasirs.setBounds(10, 10, 100, 20);
 
         jPanel3.add(jPanel2);
-        jPanel2.setBounds(10, 300, 340, 60);
+        jPanel2.setBounds(10, 210, 340, 60);
+
+        cari.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cariActionPerformed(evt);
+            }
+        });
+        cari.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                cariKeyPressed(evt);
+            }
+        });
+        jPanel3.add(cari);
+        cari.setBounds(10, 300, 150, 30);
+
+        jLabel6.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        jLabel6.setText("Pencarian(nama barang):");
+        jPanel3.add(jLabel6);
+        jLabel6.setBounds(10, 280, 200, 20);
+
+        tabel.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null}
+            },
+            new String [] {
+                "ID Barang", "Nama Barang", "Harga Barang"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane3.setViewportView(tabel);
+
+        jPanel3.add(jScrollPane3);
+        jScrollPane3.setBounds(10, 10, 960, 190);
 
         getContentPane().add(jPanel3);
         jPanel3.setBounds(10, 210, 980, 490);
@@ -462,9 +529,9 @@ public class main extends javax.swing.JFrame {
 
     private void deleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteActionPerformed
         // TODO add your handling code here:
-        int baris = tabel.getSelectedRow();
+        int baris = tabel1.getSelectedRow();
         if (baris != 1) {
-            String ID = tabel.getValueAt(baris,0).toString();
+            String ID = tabel1.getValueAt(baris,0).toString();
             String SQL = "DELETE FROM chart WHERE id='"+ID+"'";
             int status = KoneksiDB.execute(SQL);
             if (status == 1) {
@@ -488,6 +555,16 @@ public class main extends javax.swing.JFrame {
         // TODO add your handling code here:
         judul.setSelectedIndex(0);
     }//GEN-LAST:event_clearActionPerformed
+
+    private void cariKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_cariKeyPressed
+        // TODO add your handling code here:]
+        selectCari();
+    }//GEN-LAST:event_cariKeyPressed
+
+    private void cariActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cariActionPerformed
+        // TODO add your handling code here:
+        
+    }//GEN-LAST:event_cariActionPerformed
 
     /**
      * @param args the command line arguments
@@ -527,6 +604,7 @@ public class main extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel Jaml;
     private javax.swing.JLabel Jaml1;
+    private javax.swing.JTextField cari;
     private javax.swing.JButton clear;
     private javax.swing.JButton delete;
     private javax.swing.JLabel diskon;
@@ -536,6 +614,7 @@ public class main extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
@@ -543,6 +622,7 @@ public class main extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JComboBox<String> judul;
     private javax.swing.JTextField jumlah;
     private javax.swing.JLabel kasir;
@@ -550,6 +630,7 @@ public class main extends javax.swing.JFrame {
     private javax.swing.JButton print;
     private javax.swing.JButton save;
     private javax.swing.JTable tabel;
+    private javax.swing.JTable tabel1;
     private javax.swing.JLabel tanggal;
     private javax.swing.JLabel tanggal1;
     // End of variables declaration//GEN-END:variables
